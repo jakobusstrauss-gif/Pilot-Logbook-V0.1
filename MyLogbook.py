@@ -79,3 +79,16 @@ if st.session_state['step'] > 5:
         # Reset for new entry
         st.session_state['step'] = 1
         st.session_state['flight_data'] = {}
+
+# Step 6: Visual or Instrument?
+elif st.session_state['step'] == 6:
+    # Show previous data
+    st.write(f"**Flight Date:** {get_value('Date')}")
+    st.write(f"**Type of Airplane:** {get_value('Type of Airplane')}")
+    st.write(f"**Airplane Registration:** {get_value('Airplane Registration')}")
+    st.write(f"**Pilot In Command:** {get_value('Pilot In Command')}")
+    st.write(f"**Details of Flight:** {get_value('Details of Flight')}")
+    flight_type = st.radio("Type of Flight", ("Visual", "Instrument"))
+    if st.button("Next") and flight_type:
+        st.session_state['flight_data']['Flight Type'] = flight_type
+        st.session_state['step'] = 7
