@@ -1,122 +1,103 @@
 import streamlit as st
 import pandas as pd
-import uuid
 from datetime import datetime
 
-# Define columns for the logbook
-columns = [
-    "Date", "Type", "Reg", "PIC", "Details of Flight", "Nav Aids", "Place",
-    "Actual Time", "FSTD Time", "SE", "ME", "FSTD", "FSTD Actual Time",
-    "Day Dual (SE Day)", "PIC (SE Day)", "PICUS (SE Day)", "Co-Pilot (SE Day)",
-    "Night Dual (SE)", "PIC (SE Night)", "PICUS (SE Night)", "Co-Pilot (SE Night)",
-    "Day Dual (ME)", "PIC (ME Day)", "PICUS (ME Day)", "Co-Pilot (ME Day)",
-    "Night Dual (ME)", "PIC (ME Night)", "PICUS (ME Night)", "Co-Pilot (ME Night)",
-    "Day", "Night", "Remarks"
-]
-
-# Initialize session state for log entries
-if 'log_entries' not in st.session_state:
-    st.session_state['log_entries'] = []
+# Initialize or load master sheet
+try:
+    df_master = pd.read_csv('pilot_logbook_master.csv')
+except FileNotFoundError:
+    df_master = pd.DataFrame()
 
 st.title("Digital Pilot Logbook")
 
-# Helper function to convert DD-MM-YYYY to YYYY-MM-DD
-def convert_date_format(date_str):
-    try:
-        return datetime.strptime(date_str, '%d-%m-%Y').strftime('%Y-%m-%d')
-    except ValueError:
-        return date_str  # Return original string if format doesn't match
+# Function to round to two decimal places
+def round_hours(hours):
+    return round(hours, 2)
 
-# Input form for new log entry
-with st.form("entry_form"):
-    st.header("Add New Flight Log Entry")
-    input_data = {}
-
-    col1, col2, col3 = st.columns(3)
-    input_data["Date"] = col1.text_input("Date (DD-MM-YYYY)")
-    input_data["Type"] = col2.text_input("Aircraft Type")
-    input_data["Reg"] = col3.text_input("Aircraft Registration")
+# Form for flight entry
+with st.form("flight_log_form"):
+    st.header("Enter Flight Details")
     
-    col4, col5 = st.columns(2)
-    input_data["PIC"] = col4.text_input("Pilot In Command")
-    input_data["Details of Flight"] = col5.text_input("Details of Flight")
+    # 1. Date of flight (British format: DD/MM/YYYY)
+    flight_date = st.text_input("Date of Flight (DD/MM/YYYY)")
     
-    input_data["Nav Aids"] = st.text_input("Navigation Aids Used")
-    input_data["Place"] = st.text_input("Place of Navigation Aids")
+    # 2. Type of Airplane
+    aircraft_type = st.text_input("Type of Airplane")
     
-    col6, col7 = st.columns(2)
-    input_data["Actual Time"] = col6.number_input("Actual Time", min_value=0.0, step=0.01)
-    input_data["FSTD Time"] = col7.number_input("FSTD Time", min_value=0.0, step=0.01)
+    # 3. Airplane Registration
+    registration = st.text_input("Airplane Registration")
     
-    col8, col9, col10 = st.columns(3)
-    input_data["SE"] = col8.number_input("SE", min_value=0.0, step=0.01)
-    input_data["ME"] = col9.number_input("ME", min_value=0.0, step=0.01)
-    input_data["FSTD"] = col10.number_input("FSTD", min_value=0.0, step=0.01)
+    # 4. Pilot In Command Name
+    pilot_name = st.text_input("Pilot In Command Name")
     
-    input_data["FSTD Actual Time"] = st.number_input("FSTD Actual Time", min_value=0.0, step=0.01)
+    # 5. Details of Flight
+    flight_details = st.text_area("Details of Flight")
     
-    col11, col12, col13 = st.columns(3)
-    input_data["Day Dual"] = col11.number_input("Day Dual", min_value=0.0, step=0.01)
-    input_data["PIC (SE Day)"] = col12.number_input("PIC (SE Day)", min_value=0.0, step=0.01)
-    input_data["PICUS (SE Day)"] = col13.number_input("PICUS (SE Day)", min_value=0.0, step=0.01)
+    # 6. Instrument Flight Time
+    st.subheader("Instrument Flight Time")
+    navaid_type = st.text_input("Type of Navaid")
+    navaid_place = st.text_input("Place of Navaid")
+    actual_imc_hours = st.number_input("Hours flown under actual IMC", min_value=0.0, format="%.2f")
+    simulator_hours = st.number_input("Hours flown in Simulator", min_value=0.0, format="%.2f")
     
-    col14, col15, col16 = st.columns(3)
-    input_data["Co-Pilot (SE Day)"] = col14.number_input("Co-Pilot (SE Day)", min_value=0.0, step=0.01)
-    input_data["Night Dual (SE)"] = col15.number_input("Night Dual (SE)", min_value=0.0, step=0.01)
-    input_data["PIC (SE Night)"] = col16.number_input("PIC (SE Night)", min_value=0.0, step=0.01)
+    # 7. Total hours flown in simulator
+    total_sim_hours = st.number_input("Total hours flown in simulator (for this flight)", min_value=0.0, format="%.2f")
     
-    col17, col18, col19 = st.columns(3)
-    input_data["PICUS (SE Night)"] = col17.number_input("PICUS (SE Night)", min_value=0.0, step=0.01)
-    input_data["Co-Pilot (SE Night)"] = col18.number_input("Co-Pilot (SE Night)", min_value=0.0, step=0.01)
-    input_data["Day Dual (ME)"] = col19.number_input("Day Dual (ME)", min_value=0.0, step=0.01)
+    # 8. Hours in Single Engine Aircraft
+    st.subheader("Single Engine Aircraft")
+    se_day_night = st.radio("Day or Night", ("Day", "Night"))
+    se_type = st.radio("Type", ("Dual", "PIC", "PICUS", "Co-Pilot"))
+    se_hours = st.number_input("Hours flown in Single Engine", min_value=0.0, format="%.2f")
     
-    col20, col21, col22 = st.columns(3)
-    input_data["PIC (ME Day)"] = col20.number_input("PIC (ME Day)", min_value=0.0, step=0.01)
-    input_data["PICUS (ME Day)"] = col21.number_input("PICUS (ME Day)", min_value=0.0, step=0.01)
-    input_data["Co-Pilot (ME Day)"] = col22.number_input("Co-Pilot (ME Day)", min_value=0.0, step=0.01)
+    # 9. Hours in Multi Engine Aircraft
+    st.subheader("Multi Engine Aircraft")
+    me_day_night = st.radio("Day or Night", ("Day", "Night"))
+    me_type = st.radio("Type", ("Dual", "PIC", "PICUS", "Co-Pilot"))
+    me_hours = st.number_input("Hours flown in Multi Engine", min_value=0.0, format="%.2f")
     
-    col23, col24, col25 = st.columns(3)
-    input_data["Night Dual (ME)"] = col23.number_input("Night Dual (ME)", min_value=0.0, step=0.01)
-    input_data["PIC (ME Night)"] = col24.number_input("PIC (ME Night)", min_value=0.0, step=0.01)
-    input_data["PICUS (ME Night)"] = col25.number_input("PICUS (ME Night)", min_value=0.0, step=0.01)
+    # 10. Takeoffs and Landings
+    st.subheader("Takeoffs and Landings")
+    takeoff_type = st.radio("Type of Takeoff/Landing", ("Day", "Night"))
+    takeoffs = st.number_input("Number of Takeoffs", min_value=0, step=1)
+    landings = st.number_input("Number of Landings", min_value=0, step=1)
     
-    col26, col27 = st.columns(2)
-    input_data["Co-Pilot (ME Night)"] = col26.number_input("Co-Pilot (ME Night)", min_value=0.0, step=0.01)
-    input_data["Day"] = col27.number_input("Takeoffs and Landings Day", min_value=0, step=1)
-
-    col28, col29 = st.columns(2)
-    input_data["Night"] = col28.number_input("Takeoffs and Landings Night", min_value=0, step=1)
-    input_data["Remarks"] = col29.text_input("Remarks")
-
-    # Submit button
-    submitted = st.form_submit_button("Add Entry")
+    # 11. Remarks
+    remarks = st.text_area("Remarks")
+    
+    submitted = st.form_submit_button("Submit Entry")
+    
     if submitted:
-        # Convert date format
-        input_data["Date"] = convert_date_format(input_data["Date"])
-        # Append the input data to the session state list
-        st.session_state['log_entries'].append(input_data)
-        st.success("Entry added successfully!")
-
-# Display all entries in a table
-if st.session_state['log_entries']:
-    df_entries = pd.DataFrame(st.session_state['log_entries'])
-
-    # Display the table
-    st.dataframe(df_entries)
-
-    # Add an export button to download the data as CSV
-    def convert_df(df):
-        return df.to_csv(index=False).encode('utf-8')
-
-    csv = convert_df(df_entries)
-
-    st.download_button(
-        label="Download logbook as CSV",
-        data=csv,
-        file_name='pilot_logbook.csv',
-        mime='text/csv',
-    )
-
-
-
-
+        # Validate date format
+        try:
+            flight_date_obj = datetime.strptime(flight_date, "%d/%m/%Y")
+            flight_date_str = flight_date_obj.strftime("%Y-%m-%d")
+        except ValueError:
+            st.error("Invalid date format. Please enter as DD/MM/YYYY.")
+            flight_date_str = ""
+        
+        # Create a record
+        record = {
+            "Date": flight_date_str,
+            "Type of Airplane": aircraft_type,
+            "Registration": registration,
+            "Pilot Name": pilot_name,
+            "Flight Details": flight_details,
+            "Navaid Type": navaid_type,
+            "Navaid Place": navaid_place,
+            "Actual IMC Hours": round_hours(actual_imc_hours),
+            "Simulator Hours": round_hours(simulator_hours),
+            "Total Simulator Hours": round_hours(total_sim_hours),
+            "SE Day/Night": se_day_night,
+            "SE Type": se_type,
+            "SE Hours": round_hours(se_hours),
+            "ME Day/Night": me_day_night,
+            "ME Type": me_type,
+            "ME Hours": round_hours(me_hours),
+            "Takeoff/Night": takeoff_type,
+            "Takeoffs": takeoffs,
+            "Landings": landings,
+            "Remarks": remarks
+        }
+        
+        # Append to master DataFrame
+        df_master = df_master.append(record, ignore_index=True
