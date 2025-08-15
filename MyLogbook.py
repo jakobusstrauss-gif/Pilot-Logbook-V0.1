@@ -71,8 +71,5 @@ if st.session_state['log_entries']:
 
     csv = convert_df(df_entries)
 
-    st.download_button(
-        label="Download Logbook as CSV",
-        data=csv,
-        file
+
 
