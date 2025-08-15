@@ -77,8 +77,21 @@ engine_type = st.radio(
     index=0 if last_entry.get('Engine Type') == 'Single Engine' else 1
 )
 
+# 5. Hours Flown (with two decimals)
+hours_flown = st.text_input(
+    "Hours Flown (e.g., 12.34)", 
+    value=str(last_entry.get('Hours Flown', ''))
+)
+
+# Save data
 if st.button("Save Entry"):
-    # Save data to CSV
+    # Validate hours input
+    try:
+        hours_float = float(hours_flown)
+        hours_str = f"{hours_float:.2f}"
+    except:
+        hours_str = ""
+
     new_entry = {
         'Date': date_value,
         'Type of Airplane': type_of_airplane,
@@ -88,7 +101,8 @@ if st.button("Save Entry"):
         'Flight Type': flight_type,
         'Day/Night': day_night,
         'Role': pilot_role,
-        'Engine Type': engine_type
+        'Engine Type': engine_type,
+        'Hours Flown': hours_str
     }
     try:
         df_existing = pd.read_csv('pilot_logbook_master.csv')
