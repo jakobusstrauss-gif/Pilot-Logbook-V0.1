@@ -31,4 +31,12 @@ elif st.session_state['step'] == 2:
 # Step 3: Enter Airplane Registration
 elif st.session_state['step'] == 3:
     # Show the data collected so far
-    st.write(f"
+    st.write(f"**Flight Date:** {st.session_state['flight_data']['Date']}")
+    st.write(f"**Type of Airplane:** {st.session_state['flight_data']['Type of Airplane']}")
+    registration = st.text_input("Enter Airplane Registration")
+    if st.button("Next") and registration:
+        st.session_state['flight_data']['Airplane Registration'] = registration
+        st.session_state['step'] = 4
+
+# After step 3, further steps can be added following the same pattern
+# For example, adding pilot name, flight details, etc.
