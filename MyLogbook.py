@@ -121,4 +121,4 @@ if st.button("Save Entry"):
     except:
         pd.DataFrame([new_record]).to_csv('pilot_logbook_master.csv', index=False)
 
-    st.success("Entry saved successfully!"
+    st.success("Entry saved successfully!")
