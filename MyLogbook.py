@@ -1,15 +1,14 @@
 import streamlit as st
 from datetime import datetime
+import pandas as pd
 
-# Load existing data (if any)
+# Load existing data
 try:
     df = pd.read_csv('pilot_logbook_master.csv')
-    # Optionally, load the last entry as default
     last_entry = df.iloc[-1].to_dict()
 except:
     last_entry = {}
 
-# Collect all data in one form
 st.title("Pilot Logbook Entry (Editable)")
 
 # Date of Flight
@@ -50,14 +49,20 @@ details_of_flight = st.text_area(
     value=last_entry.get('Details of Flight', '')
 )
 
-# Flight Type: Visual or Instrument
+# 1. Visual or Instrument?
 flight_type = st.radio(
     "Visual or Instrument?", 
     ("Visual", "Instrument"), 
-    index=0 if last_entry.get('Flight Type', 'Visual') == 'Visual' else 1
+    index=0 if last_entry.get('Flight Type') == 'Visual' else 1
 )
 
-# Display all fields
+# 2. Day or Night? (after selecting Visual/Instrument)
+day_night = st.radio(
+    "Day or Night?", 
+    ("Day", "Night"), 
+    index=0 if last_entry.get('Day/Night') == 'Day' else 1
+)
+
 if st.button("Save Entry"):
     # Save data to CSV
     new_entry = {
@@ -66,9 +71,9 @@ if st.button("Save Entry"):
         'Airplane Registration': registration,
         'Pilot In Command': pilot_in_command,
         'Details of Flight': details_of_flight,
-        'Flight Type': flight_type
+        'Flight Type': flight_type,
+        'Day/Night': day_night
     }
-    # Append to existing CSV
     try:
         df_existing = pd.read_csv('pilot_logbook_master.csv')
         df_existing = df_existing.append(new_entry, ignore_index=True)
