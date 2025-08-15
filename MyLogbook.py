@@ -57,5 +57,6 @@ with st.form("entry_form"):
     submitted = st.form_submit_button("Add Entry")
     
 if submitted:
-    # code to save data when button is clicked
-    # (e.g., append input_data to session state)
+    # This line should be indented
+    st.session_state['log_entries'].append(input_data)
+    st.success("Entry added successfully!")
