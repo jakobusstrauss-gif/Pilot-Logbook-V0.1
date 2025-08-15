@@ -21,7 +21,7 @@ with st.form("log_flight_form"):
     pilot_in_command = st.text_input("Name of Pilot in Command")
     
     # Pilot role
-    role = st.selectbox("Role of Pilot", ["Dual", "PIC", "PICUS", "Co-Pilot"])
+    role = st.selectbox("Role of Pilot", ["Dual", "PIC", "PICUS", "Co-Pilot", "Instructor"])
     
     # Flight specifics
     flight_details = st.text_area("Details of Flight")
