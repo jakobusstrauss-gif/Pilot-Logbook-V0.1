@@ -5,7 +5,7 @@ import pandas as pd
 if 'flight_logs' not in st.session_state:
     st.session_state['flight_logs'] = pd.DataFrame(columns=[
         'Date', 'Aircraft Type', 'Registration', 'Pilot in Command', 'Role', 'Flight Details',
-        'Hours Flown', 'Actual Instrument Time', 'Simulator Time', 'Day/Night', 'Engine Type'
+        'Hours Flown', 'Actual Instrument Time', 'Simulator Time', 'Day/Night', 'Takeoffs and Landings', 'Engine Type'
     ])
 
 st.title("Pilot Flight Hours Log")
@@ -29,6 +29,16 @@ with st.form("log_flight_form"):
     actual_instrument_time = st.number_input("Actual Instrument Flight Time (hours)", min_value=0.0, max_value=24.0, step=0.1)
     simulator_time = st.number_input("Simulator Flight Time (hours)", min_value=0.0, max_value=24.0, step=0.1)
     day_night = st.selectbox("Day or Night Flight", ["Day", "Night"])
+    
+    # Determine Takeoffs and Landings based on Day/Night selection
+    if day_night == "Day":
+        takeoffs_landings = 2  # example default, can be modified
+    else:
+        takeoffs_landings = 1  # example default, can be modified
+    
+    # Allow manual input or adjustment
+    takeoffs_landings_input = st.number_input("Number of Takeoffs and Landings", min_value=0, max_value=20, value=takeoffs_landings)
+    
     engine_type = st.selectbox("Engine Type", ["Single Engine", "Multi Engine"])
     
     submitted = st.form_submit_button("Add Flight")
@@ -50,6 +60,7 @@ with st.form("log_flight_form"):
                 'Actual Instrument Time': actual_instrument_time,
                 'Simulator Time': simulator_time,
                 'Day/Night': day_night,
+                'Takeoffs and Landings': takeoffs_landings_input,
                 'Engine Type': engine_type
             }
             st.session_state['flight_logs'] = st.session_state['flight_logs'].append(new_entry, ignore_index=True)
