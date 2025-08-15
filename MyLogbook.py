@@ -9,7 +9,7 @@ except:
     df = pd.DataFrame(columns=[
         'Date', 'Type of Airplane', 'Airplane Registration', 'Pilot In Command',
         'Details of Flight', 'Day/Night', 'Role', 'Engine Type',
-        'Hours Flown'
+        'Visual Hours', 'Instrument Hours'
     ])
 
 # Use the last entry to pre-fill fields if exists
@@ -69,26 +69,39 @@ role = st.radio(
     index=0 if last_entry.get('Role') == 'Dual' else 1
 )
 
-# 3. Single Engine or Multi Engine?
+# 3. Single or Multi Engine?
 engine_type = st.radio(
     "Aircraft Type:", 
     ("Single Engine", "Multi Engine"),
     index=0 if last_entry.get('Engine Type') == 'Single Engine' else 1
 )
 
-# 4. Hours Flown
-hours_input = st.text_input(
-    "Hours Flown (e.g., 12.34)", 
-    value=str(last_entry.get('Hours Flown', ''))
+# Hours: separate inputs for Visual and Instrument
+visual_hours_input = st.text_input(
+    "Visual Hours (e.g., 12.34)", 
+    value=str(last_entry.get('Visual Hours', ''))
 )
-try:
-    hours_value = float(hours_input)
-    hours_str = f"{hours_value:.2f}"
-except:
-    hours_value = 0.0
-    hours_str = "0.00"
+instrument_hours_input = st.text_input(
+    "Instrument Hours (e.g., 5.67)", 
+    value=str(last_entry.get('Instrument Hours', ''))
+)
 
-# Save button to store the data
+# Attempt to convert inputs to float
+try:
+    visual_hours = float(visual_hours_input)
+    visual_hours_str = f"{visual_hours:.2f}"
+except:
+    visual_hours = 0.0
+    visual_hours_str = "0.00"
+
+try:
+    instrument_hours = float(instrument_hours_input)
+    instrument_hours_str = f"{instrument_hours:.2f}"
+except:
+    instrument_hours = 0.0
+    instrument_hours_str = "0.00"
+
+# Save button
 if st.button("Save Entry"):
     new_record = {
         'Date': date_value,
@@ -99,7 +112,8 @@ if st.button("Save Entry"):
         'Day/Night': day_night,
         'Role': role,
         'Engine Type': engine_type,
-        'Hours Flown': hours_str
+        'Visual Hours': visual_hours_str,
+        'Instrument Hours': instrument_hours_str
     }
     try:
         df_existing = pd.read_csv('pilot_logbook_master.csv')
