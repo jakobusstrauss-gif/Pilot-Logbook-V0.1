@@ -50,4 +50,12 @@ with st.form("entry_form"):
     input_data["Night Dual in Single Engine"] = st.number_input("Night Dual in Single Engine (hours)", min_value=0.0, step=0.1)
     input_data["Night PIC in Single Engine"] = st.number_input("Night PIC in Single Engine (hours)", min_value=0.0, step=0.1)
 
-st.form_submit_button() 
+with st.form("entry_form"):
+    # your input fields here...
+
+    # Add a submit button inside the form with a label:
+    submitted = st.form_submit_button("Add Entry")
+    
+    if submitted:
+        # code to save data when button is clicked
+        # (e.g., append input_data to session state)
