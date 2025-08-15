@@ -74,6 +74,8 @@ with st.form("flight_log_form"):
         except ValueError:
             st.error("Invalid date format. Please enter as DD/MM/YYYY.")
             flight_date_str = ""
+            # Stop processing if date is invalid
+            st.stop()
         
         # Create a record
         record = {
@@ -90,14 +92,4 @@ with st.form("flight_log_form"):
             "SE Day/Night": se_day_night,
             "SE Type": se_type,
             "SE Hours": round_hours(se_hours),
-            "ME Day/Night": me_day_night,
-            "ME Type": me_type,
-            "ME Hours": round_hours(me_hours),
-            "Takeoff/Night": takeoff_type,
-            "Takeoffs": takeoffs,
-            "Landings": landings,
-            "Remarks": remarks
-        }
-        
-        # Append to master DataFrame
-        df_master = df_master.append(record, ignore_index=True)
+            "ME Day/N
