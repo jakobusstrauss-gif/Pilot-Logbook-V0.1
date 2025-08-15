@@ -104,4 +104,4 @@ with st.form("flight_log_form"):
         df_master = df_master.append(record, ignore_index=True)
         
         # Save to CSV file
-        df_master.to_csv('pilot_logbook_master.csv', index
+        df_master.to_csv('pilot_logbook_master.csv', index)
