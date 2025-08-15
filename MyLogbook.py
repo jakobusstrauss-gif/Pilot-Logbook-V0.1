@@ -56,6 +56,6 @@ with st.form("entry_form"):
     # Add a submit button inside the form with a label:
     submitted = st.form_submit_button("Add Entry")
     
-    if submitted:
-        # code to save data when button is clicked
-        # (e.g., append input_data to session state)
+if submitted:
+    # code to save data when button is clicked
+    # (e.g., append input_data to session state)
