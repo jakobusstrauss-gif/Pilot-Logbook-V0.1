@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-# Initialize or load master sheet
+# Load existing master sheet or create a new one
 try:
     df_master = pd.read_csv('pilot_logbook_master.csv')
 except FileNotFoundError:
@@ -10,15 +10,15 @@ except FileNotFoundError:
 
 st.title("Digital Pilot Logbook")
 
-# Function to round to two decimal places
+# Function to round hours to 2 decimal places
 def round_hours(hours):
     return round(hours, 2)
 
-# Form for flight entry
+# Define the form for new flight entry
 with st.form("flight_log_form"):
     st.header("Enter Flight Details")
     
-    # 1. Date of flight (British format: DD/MM/YYYY)
+    # 1. Date of flight (British format dd/mm/yyyy)
     flight_date = st.text_input("Date of Flight (DD/MM/YYYY)")
     
     # 2. Type of Airplane
@@ -33,7 +33,7 @@ with st.form("flight_log_form"):
     # 5. Details of Flight
     flight_details = st.text_area("Details of Flight")
     
-    # 6. Instrument Flight Time
+    # 6. Instrument Flight Time Section
     st.subheader("Instrument Flight Time")
     navaid_type = st.text_input("Type of Navaid")
     navaid_place = st.text_input("Place of Navaid")
@@ -64,22 +64,21 @@ with st.form("flight_log_form"):
     # 11. Remarks
     remarks = st.text_area("Remarks")
     
+    # Submit button
     submitted = st.form_submit_button("Submit Entry")
     
     if submitted:
-        # Validate date format
+        # Validate date
         try:
-            flight_date_obj = datetime.strptime(flight_date, "%d/%m/%Y")
-            flight_date_str = flight_date_obj.strftime("%Y-%m-%d")
-        except ValueError:
+            date_obj = datetime.strptime(flight_date, "%d/%m/%Y")
+            date_str = date_obj.strftime("%Y-%m-%d")
+        except:
             st.error("Invalid date format. Please enter as DD/MM/YYYY.")
-            flight_date_str = ""
-            # Stop processing if date is invalid
             st.stop()
         
-        # Create a record
+        # Create record dictionary
         record = {
-            "Date": flight_date_str,
+            "Date": date_str,
             "Type of Airplane": aircraft_type,
             "Registration": registration,
             "Pilot Name": pilot_name,
@@ -92,4 +91,17 @@ with st.form("flight_log_form"):
             "SE Day/Night": se_day_night,
             "SE Type": se_type,
             "SE Hours": round_hours(se_hours),
-            "ME Day/N
+            "ME Day/Night": me_day_night,
+            "ME Type": me_type,
+            "ME Hours": round_hours(me_hours),
+            "Takeoff/Night": takeoff_type,
+            "Takeoffs": takeoffs,
+            "Landings": landings,
+            "Remarks": remarks
+        }
+        
+        # Append the new record to the master DataFrame
+        df_master = df_master.append(record, ignore_index=True)
+        
+        # Save to CSV file
+        df_master.to_csv('pilot_logbook_master.csv', index
