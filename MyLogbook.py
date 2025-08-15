@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from datetime import datetime
 
 # Initialize session state for flight logs
 if 'flight_logs' not in st.session_state:
@@ -10,45 +11,31 @@ if 'flight_logs' not in st.session_state:
 
 st.title("Pilot Flight Hours Log")
 
+# Set default values for input fields
+default_date = datetime.now().strftime("%d/%m/%Y")
+default_hours = 1.0
+default_takeoffs = 1
+
 # Input form for a new flight
 with st.form("log_flight_form"):
-    # Date input
-    date_str = st.text_input("Flight Date (DD/MM/YYYY)", placeholder="e.g., 15/08/2025")
-    
-    # Flight details
+    date_str = st.text_input("Flight Date (DD/MM/YYYY)", value=default_date)
     aircraft_type = st.text_input("Type of Aircraft")
     registration = st.text_input("Registration")
     pilot_in_command = st.text_input("Name of Pilot in Command")
-    
-    # Pilot role
     role = st.selectbox("Role of Pilot", ["Dual", "PIC", "PICUS", "Co-Pilot", "Instructor"])
-    
-    # Flight specifics
     flight_details = st.text_area("Details of Flight")
-    hours_flown = st.number_input("Total Hours Flown", min_value=0.1, max_value=24.0, step=0.1)
+    hours_flown = st.number_input("Total Hours Flown", min_value=0.1, max_value=24.0, step=0.1, value=default_hours)
     actual_instrument_time = st.number_input("Actual Instrument Flight Time (hours)", min_value=0.0, max_value=24.0, step=0.1)
     simulator_time = st.number_input("Simulator Flight Time (hours)", min_value=0.0, max_value=24.0, step=0.1)
     day_night = st.selectbox("Day or Night Flight", ["Day", "Night"])
-    
-    # Determine Takeoffs and Landings based on Day/Night selection
-    if day_night == "Day":
-        takeoffs_landings = 2  # example default, can be modified
-    else:
-        takeoffs_landings = 1  # example default, can be modified
-    
-    # Allow manual input or adjustment
-    takeoffs_landings_input = st.number_input("Number of Takeoffs and Landings", min_value=0, max_value=20, value=takeoffs_landings)
-    
+    takeoffs_landings = st.number_input("Takeoffs and Landings", min_value=0, max_value=20, value=default_takeoffs)
     engine_type = st.selectbox("Engine Type", ["Single Engine", "Multi Engine"])
-    
     submitted = st.form_submit_button("Add Flight")
-    
+
     if submitted:
-        from datetime import datetime
         try:
             date_obj = datetime.strptime(date_str, "%d/%m/%Y")
-            date_formatted = date_obj.strftime("%Y-%m-%d")  # ISO format
-            # Append new log to session state
+            date_formatted = date_obj.strftime("%Y-%m-%d")
             new_entry = {
                 'Date': date_formatted,
                 'Aircraft Type': aircraft_type,
@@ -60,13 +47,17 @@ with st.form("log_flight_form"):
                 'Actual Instrument Time': actual_instrument_time,
                 'Simulator Time': simulator_time,
                 'Day/Night': day_night,
-                'Takeoffs and Landings': takeoffs_landings_input,
+                'Takeoffs and Landings': takeoffs_landings,
                 'Engine Type': engine_type
             }
-            st.session_state['flight_logs'] = st.session_state['flight_logs'].append(new_entry, ignore_index=True)
+            # Append to the DataFrame
+            new_row = pd.DataFrame([new_entry])
+            st.session_state['flight_logs'] = pd.concat([st.session_state['flight_logs'], new_row], ignore_index=True)
             st.success("Flight logged successfully!")
         except ValueError:
             st.error("Invalid date format. Please use DD/MM/YYYY.")
+
+# Reset input fields after submission is handled (handled automatically in Streamlit)
 
 # Display logged flights
 st.header("Logged Flights")
