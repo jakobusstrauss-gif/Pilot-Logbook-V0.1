@@ -52,4 +52,25 @@ elif st.session_state['step'] == 5:
     # Show previous data
     st.write(f"**Flight Date:** {st.session_state['flight_data']['Date']}")
     st.write(f"**Type of Airplane:** {st.session_state['flight_data']['Type of Airplane']}")
-    st.write(f"**Airplane Registration:** {st
+    st.write(f"**Airplane Registration:** {st.session_state['flight_data']['Airplane Registration']}")
+    st.write(f"**Pilot In Command:** {st.session_state['flight_data']['Pilot In Command']}")
+    # Input for Details of Flight
+    flight_details = st.text_area("Enter Details of Flight")
+    if st.button("Next") and flight_details:
+        st.session_state['flight_data']['Details of Flight'] = flight_details
+        st.session_state['step'] = 6
+
+# After this, further steps can be added similarly...
+
+# Review and Save
+if st.session_state['step'] > 5:
+    st.write("Current collected data:")
+    for key, value in st.session_state['flight_data'].items():
+        st.write(f"**{key}:** {value}")
+
+    if st.button("Save Entry"):
+        # Save to CSV or database here
+        st.success("Data saved successfully!")
+        # Reset for new entry
+        st.session_state['step'] = 1
+        st.session_state['flight_data'] = {}
