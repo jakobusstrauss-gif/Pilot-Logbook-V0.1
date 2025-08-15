@@ -69,4 +69,4 @@ with st.form("logbook_form"):
         # Validate date
         try:
             date_obj = datetime.strptime(date_input, "%d/%m/%Y")
-            date_str = date_obj.strftime("%Y-%m
+            date_str = date_obj.strftime("%Y-%m)
