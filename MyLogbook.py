@@ -7,7 +7,7 @@ from datetime import datetime
 columns = [
     "Date", "Type", "Reg", "PIC", "Details of Flight", "Nav Aids", "Place",
     "Actual Time", "FSTD Time", "SE", "ME", "FSTD", "FSTD Actual Time",
-    "Day Dual", "PIC (SE Day)", "PICUS (SE Day)", "Co-Pilot (SE Day)",
+    "Day Dual (SE Day)", "PIC (SE Day)", "PICUS (SE Day)", "Co-Pilot (SE Day)",
     "Night Dual (SE)", "PIC (SE Night)", "PICUS (SE Night)", "Co-Pilot (SE Night)",
     "Day Dual (ME)", "PIC (ME Day)", "PICUS (ME Day)", "Co-Pilot (ME Day)",
     "Night Dual (ME)", "PIC (ME Night)", "PICUS (ME Night)", "Co-Pilot (ME Night)",
