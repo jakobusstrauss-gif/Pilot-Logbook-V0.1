@@ -100,4 +100,4 @@ with st.form("flight_log_form"):
         }
         
         # Append to master DataFrame
-        df_master = df_master.append(record, ignore_index=True
+        df_master = df_master.append(record, ignore_index=True)
