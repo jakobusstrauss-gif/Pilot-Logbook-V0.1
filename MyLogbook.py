@@ -4,7 +4,7 @@ import pandas as pd
 # Initialize session state for flight logs
 if 'flight_logs' not in st.session_state:
     st.session_state['flight_logs'] = pd.DataFrame(columns=[
-        'Date', 'Aircraft Type', 'Registration', 'Pilot in Command', 'Flight Details',
+        'Date', 'Aircraft Type', 'Registration', 'Pilot in Command', 'Role', 'Flight Details',
         'Hours Flown', 'Day/Night', 'Engine Type'
     ])
 
@@ -19,9 +19,12 @@ with st.form("log_flight_form"):
     aircraft_type = st.text_input("Type of Aircraft")
     registration = st.text_input("Registration")
     pilot_in_command = st.text_input("Name of Pilot in Command")
-    flight_details = st.text_area("Details of Flight")
+    
+    # Pilot role
+    role = st.selectbox("Role of Pilot", ["Dual", "PIC", "PICUS", "Co-Pilot"])
     
     # Flight specifics
+    flight_details = st.text_area("Details of Flight")
     hours_flown = st.number_input("Hours Flown", min_value=0.1, max_value=24.0, step=0.1)
     day_night = st.selectbox("Day or Night Flight", ["Day", "Night"])
     engine_type = st.selectbox("Engine Type", ["Single Engine", "Multi Engine"])
@@ -39,6 +42,7 @@ with st.form("log_flight_form"):
                 'Aircraft Type': aircraft_type,
                 'Registration': registration,
                 'Pilot in Command': pilot_in_command,
+                'Role': role,
                 'Flight Details': flight_details,
                 'Hours Flown': hours_flown,
                 'Day/Night': day_night,
