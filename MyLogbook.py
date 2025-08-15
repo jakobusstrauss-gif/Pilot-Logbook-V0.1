@@ -49,4 +49,4 @@ with st.form("entry_form"):
     input_data["Day Co-pilot in Single Engine"] = st.number_input("Day Co-pilot in Single Engine (hours)", min_value=0.0, step=0.1)
     input_data["Night Dual in Single Engine"] = st.number_input("Night Dual in Single Engine (hours)", min_value=0.0, step=0.1)
     input_data["Night PIC in Single Engine"] = st.number_input("Night PIC in Single Engine (hours)", min_value=0.0, step=0.1)
-    input_data["Night PIC under Supervision"] = st.number_input("Night PIC under Supervision (hours)", min
+    input_data["Night PIC under Supervision"] = st.number_input("Night PIC under Supervision (hours)", min_value=0.0, step=0.1)
