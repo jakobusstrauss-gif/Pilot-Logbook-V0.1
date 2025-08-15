@@ -8,14 +8,13 @@ try:
 except:
     df = pd.DataFrame(columns=[
         'Date', 'Type of Airplane', 'Airplane Registration', 'Pilot In Command',
-        'Details of Flight', 'Day/Night', 'Role', 'Engine Type',
-        'Visual Hours', 'Instrument Hours'
+        'Details of Flight', 'Day', 'Night', 'Role', 'Engine Type'
     ])
 
-# Use the last entry to pre-fill fields if exists
+# Use last entry for pre-fill
 last_entry = df.iloc[-1] if not df.empty else {}
 
-st.title("Pilot Logbook Entry (Editable)")
+st.title("Pilot Logbook Entry with Day/Night Hours Rule (Editable)")
 
 # Date of Flight
 date_input = st.text_input(
@@ -55,66 +54,48 @@ details_of_flight = st.text_area(
     value=last_entry.get('Details of Flight', '')
 )
 
-# 1. Day or Night?
-day_night = st.radio(
+# 1. Day or Night
+day_night_selection = st.radio(
     "Day or Night?", 
     ("Day", "Night"), 
-    index=0 if last_entry.get('Day/Night') == 'Day' else 1
+    index=0 if last_entry.get('Day') == 'Yes' else 1
 )
 
-# 2. Role: Dual, PIC, PICUS, Co-Pilot
-role = st.radio(
-    "Flight Role:", 
-    ("Dual", "PIC", "PICUS", "Co-Pilot"), 
-    index=0 if last_entry.get('Role') == 'Dual' else 1
+# 2. Hours Flown (single input, saved into Day or Night column depending on selection)
+hours_input = st.text_input(
+    "Hours Flown (e.g., 12.34)",
+    value=str(last_entry.get('Hours Flown', ''))
 )
-
-# 3. Single or Multi Engine?
-engine_type = st.radio(
-    "Aircraft Type:", 
-    ("Single Engine", "Multi Engine"),
-    index=0 if last_entry.get('Engine Type') == 'Single Engine' else 1
-)
-
-# Hours: separate inputs for Visual and Instrument
-visual_hours_input = st.text_input(
-    "Visual Hours (e.g., 12.34)", 
-    value=str(last_entry.get('Visual Hours', ''))
-)
-instrument_hours_input = st.text_input(
-    "Instrument Hours (e.g., 5.67)", 
-    value=str(last_entry.get('Instrument Hours', ''))
-)
-
-# Attempt to convert inputs to float
 try:
-    visual_hours = float(visual_hours_input)
-    visual_hours_str = f"{visual_hours:.2f}"
+    hours_value = float(hours_input)
+    hours_formatted = f"{hours_value:.2f}"
 except:
-    visual_hours = 0.0
-    visual_hours_str = "0.00"
-
-try:
-    instrument_hours = float(instrument_hours_input)
-    instrument_hours_str = f"{instrument_hours:.2f}"
-except:
-    instrument_hours = 0.0
-    instrument_hours_str = "0.00"
+    hours_value = 0.0
+    hours_formatted = "0.00"
 
 # Save button
 if st.button("Save Entry"):
+    # Initialize row with previous data or empty
     new_record = {
         'Date': date_value,
         'Type of Airplane': type_of_airplane,
         'Airplane Registration': registration,
         'Pilot In Command': pilot_in_command,
         'Details of Flight': details_of_flight,
-        'Day/Night': day_night,
-        'Role': role,
-        'Engine Type': engine_type,
-        'Visual Hours': visual_hours_str,
-        'Instrument Hours': instrument_hours_str
+        'Role': '',  # Placeholder
+        'Engine Type': ''  # Placeholder
+        # 'Day' and 'Night' columns to be filled below
     }
+
+    # Prepare Day/Night
+    if day_night_selection == 'Day':
+        new_record['Day'] = hours_formatted
+        new_record['Night'] = ''
+    else:
+        new_record['Day'] = ''
+        new_record['Night'] = hours_formatted
+
+    # Read existing CSV and append new record
     try:
         df_existing = pd.read_csv('pilot_logbook_master.csv')
         df_existing = df_existing.append(new_record, ignore_index=True)
