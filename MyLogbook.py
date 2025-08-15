@@ -1,94 +1,103 @@
 import streamlit as st
 from datetime import datetime
+import pandas as pd
 
-# Initialize session state
-if 'flight_data' not in st.session_state:
-    st.session_state['flight_data'] = {}
-if 'step' not in st.session_state:
-    st.session_state['step'] = 1
+# Initialize or load the master dataset
+try:
+    df_master = pd.read_csv('pilot_logbook_master.csv')
+except FileNotFoundError:
+    df_master = pd.DataFrame()
 
-st.title("Digital Pilot Logbook - New Flight Entry")
+st.title("Digital Pilot Logbook - New Entry (Editable)")
 
-# Helper function to get value with default
-def get_value(key, default=''):
-    return st.session_state['flight_data'].get(key, default)
+# Initialize a dict to hold current data
+current_data = {}
 
-# Step 1: Date of Flight
-if st.session_state['step'] == 1:
-    date_input = st.text_input("Enter Date of Flight (DD/MM/YYYY)", value=get_value('Date', ''))
-    if st.button("Next") and date_input:
-        try:
-            date_obj = datetime.strptime(date_input, "%d/%m/%Y")
-            st.session_state['flight_data']['Date'] = date_obj.strftime('%Y-%m-%d')
-            st.session_state['step'] = 2
-        except:
-            st.error("Invalid date format. Please enter as DD/MM/YYYY.")
+# Input fields for all data with existing data pre-filled
+date_input = st.text_input(
+    "Date of Flight (DD/MM/YYYY)", 
+    value=current_data.get('Date', '')
+)
+try:
+    # If a date is entered, validate and store in standard format
+    if date_input:
+        date_obj = datetime.strptime(date_input, "%d/%m/%Y")
+        current_data['Date'] = date_obj.strftime('%Y-%m-%d')
+except:
+    pass  # If invalid, keep the string as entered
 
-# Step 2: Type of Airplane
-elif st.session_state['step'] == 2:
-    st.write(f"**Flight Date:** {get_value('Date')}")
-    aircraft_type = st.text_input("Enter Type of Airplane", value=get_value('Type of Airplane', ''))
-    if st.button("Next") and aircraft_type:
-        st.session_state['flight_data']['Type of Airplane'] = aircraft_type
-        st.session_state['step'] = 3
+# Type of Airplane
+current_data['Type of Airplane'] = st.text_input(
+    "Type of Airplane", value=current_data.get('Type of Airplane', '')
+)
 
-# Step 3: Airplane Registration
-elif st.session_state['step'] == 3:
-    st.write(f"**Flight Date:** {get_value('Date')}")
-    st.write(f"**Type of Airplane:** {get_value('Type of Airplane')}")
-    registration = st.text_input("Enter Airplane Registration", value=get_value('Airplane Registration', ''))
-    if st.button("Next") and registration:
-        st.session_state['flight_data']['Airplane Registration'] = registration
-        st.session_state['step'] = 4
+# Airplane Registration
+current_data['Airplane Registration'] = st.text_input(
+    "Airplane Registration", value=current_data.get('Airplane Registration', '')
+)
 
-# Step 4: Pilot In Command
-elif st.session_state['step'] == 4:
-    st.write(f"**Flight Date:** {get_value('Date')}")
-    st.write(f"**Type of Airplane:** {get_value('Type of Airplane')}")
-    st.write(f"**Airplane Registration:** {get_value('Airplane Registration')}")
-    pilot_in_command = st.text_input("Enter Pilot In Command", value=get_value('Pilot In Command', ''))
-    if st.button("Next") and pilot_in_command:
-        st.session_state['flight_data']['Pilot In Command'] = pilot_in_command
-        st.session_state['step'] = 5
+# Pilot In Command
+current_data['Pilot In Command'] = st.text_input(
+    "Pilot In Command", value=current_data.get('Pilot In Command', '')
+)
 
-# Step 5: Details of Flight
-elif st.session_state['step'] == 5:
-    # Show all previous data
-    st.write(f"**Flight Date:** {get_value('Date')}")
-    st.write(f"**Type of Airplane:** {get_value('Type of Airplane')}")
-    st.write(f"**Airplane Registration:** {get_value('Airplane Registration')}")
-    st.write(f"**Pilot In Command:** {get_value('Pilot In Command')}")
-    # Editable textarea for flight details
-    details = st.text_area("Enter Details of Flight", value=get_value('Details of Flight', ''))
-    if st.button("Next") and details:
-        st.session_state['flight_data']['Details of Flight'] = details
-        st.session_state['step'] = 6
+# Details of Flight
+current_data['Details of Flight'] = st.text_area(
+    "Details of Flight", value=current_data.get('Details of Flight', '')
+)
 
-# Additional steps can follow similarly...
+# Visual or Instrument
+current_data['Flight Type'] = st.radio(
+    "Visual or Instrument?", 
+    ("Visual", "Instrument"), 
+    index=0 if current_data.get('Flight Type', '') == 'Visual' else 1
+)
 
-# Final review and save
-if st.session_state['step'] > 5:
-    st.write("Current data (editable):")
-    for key, value in st.session_state['flight_data'].items():
-        if key != 'Date':  # Date is already stored in 'Date'
-            new_value = st.text_input(f"{key}", value=value)
-            st.session_state['flight_data'][key] = new_value
-    if st.button("Save Entry"):
-        # Here, you'd typically write to CSV or database
-        st.success("Data saved successfully!")
-        # Reset for new entry
-        st.session_state['step'] = 1
-        st.session_state['flight_data'] = {}
+# Now, display all other fields, for example:
+# Instrument Flight Time
+current_data['Navaid Type'] = st.text_input(
+    "Type of Navaid", value=current_data.get('Navaid Type', '')
+)
+current_data['Navaid Place'] = st.text_input(
+    "Place of Navaid", value=current_data.get('Navaid Place', '')
+)
+current_data['Actual IMC Hours'] = st.number_input(
+    "Hours flown under actual IMC", value=float(current_data.get('Actual IMC Hours', 0.0)), format="%.2f"
+)
+current_data['Simulator Hours'] = st.number_input(
+    "Hours flown in Simulator", value=float(current_data.get('Simulator Hours', 0.0)), format="%.2f"
+)
+current_data['Total Simulator Hours'] = st.number_input(
+    "Total hours flown in simulator", value=float(current_data.get('Total Simulator Hours', 0.0)), format="%.2f"
+)
 
-# Step 6: Visual or Instrument?
-elif st.session_state['step'] == 6:
-    # Show previous data
-    st.write(f"**Flight Date:** {get_value('Date')}")
-    st.write(f"**Type of Airplane:** {get_value('Type of Airplane')}")
-    st.write(f"**Airplane Registration:** {get_value('Airplane Registration')}")
-    st.write(f"**Pilot In Command:** {get_value('Pilot In Command')}")
-    st.write(f"**Details of Flight:** {get_value('Details of Flight')}")
-    flight_type = st.radio("Type of Flight", ("Visual", "Instrument"))
-    if st.button("Next") and flight_type:
-        st.session_state['flight_data']['Flight Type'] = flight_type
-        st.session_state['step'] = 7
+# Hours flown in Single Engine
+current_data['SE Day/Night'] = st.radio(
+    "Single Engine - Day or Night?", ("Day", "Night"), index=0 if current_data.get('SE Day/Night', '') == 'Day' else 1
+)
+current_data['SE Type'] = st.selectbox(
+    "Single Engine Type", ("Dual", "PIC", "PICUS", "Co-Pilot"), 
+    index=0 if current_data.get('SE Type', '') == 'Dual' else 1
+)
+current_data['SE Hours'] = st.number_input(
+    "Hours flown in Single Engine", value=float(current_data.get('SE Hours', 0.0)), format="%.2f"
+)
+
+# Hours flown in Multi Engine
+current_data['ME Day/Night'] = st.radio(
+    "Multi Engine - Day or Night?", ("Day", "Night"), index=0 if current_data.get('ME Day/Night', '') == 'Day' else 1
+)
+current_data['ME Type'] = st.selectbox(
+    "Multi Engine Type", ("Dual", "PIC", "PICUS", "Co-Pilot"), 
+    index=0 if current_data.get('ME Type', '') == 'Dual' else 1
+)
+current_data['ME Hours'] = st.number_input(
+    "Hours flown in Multi Engine", value=float(current_data.get('ME Hours', 0.0)), format="%.2f"
+)
+
+# Takeoffs and Landings
+current_data['Takeoff/Night'] = st.radio(
+    "Takeoffs/Night?", ("Day", "Night"), index=0 if current_data.get('Takeoff/Night', '') == 'Day' else 1
+)
+current_data['Takeoffs'] = st.number_input(
+    "Number of Takeoffs", value=int
