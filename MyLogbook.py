@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# Define column headers
+# Define columns
 columns = [
     "Date (Brit format)", "Aircraft Type", "Aircraft Registration", "Pilot In Command",
     "Flight Details", "Navigation Aids Used", "Place of Navigation Aids",
@@ -16,13 +16,13 @@ columns = [
     "Takeoffs and Landings Day", "Takeoffs and Landings Night", "Remarks"
 ]
 
-# Initialize session state for pilot log entries
+# Initialize session state for logs
 if 'log_entries' not in st.session_state:
     st.session_state['log_entries'] = []
 
 st.title("Digital Pilot Logbook")
 
-# Display form for input
+# Form for new entry
 with st.form("entry_form"):
     st.header("Add New Flight Log Entry")
     input_data = {}
@@ -48,5 +48,5 @@ with st.form("entry_form"):
     input_data["Day PIC under Supervision"] = st.number_input("Day PIC under Supervision (hours)", min_value=0.0, step=0.1)
     input_data["Day Co-pilot in Single Engine"] = st.number_input("Day Co-pilot in Single Engine (hours)", min_value=0.0, step=0.1)
     input_data["Night Dual in Single Engine"] = st.number_input("Night Dual in Single Engine (hours)", min_value=0.0, step=0.1)
-    input_data["Night PIC in Single Engine"] = st.number_input("Night PIC in Single Engine (hours)", min_value=0.0, step=0.1)
-    input_data["Night PIC under Supervision"] = st.number_input("Night PIC under Supervision (hours)", min_value=0.0, step=0.1)
+    input_data["Night PIC in Single Engine"] = st.number_input("Night PIC in Single Engine (hours)", min
+
