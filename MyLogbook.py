@@ -63,11 +63,18 @@ day_night = st.radio(
     index=0 if last_entry.get('Day/Night') == 'Day' else 1
 )
 
-# 3. Dual, PIC, PICUS, or Co-Pilot?
-pilot_type = st.radio(
+# 3. Dual, PIC, PICUS, Co-Pilot
+pilot_role = st.radio(
     "Flight Role:", 
     ("Dual", "PIC", "PICUS", "Co-Pilot"), 
     index=0 if last_entry.get('Role') == 'Dual' else 1
+)
+
+# 4. Single Engine or Multi Engine?
+engine_type = st.radio(
+    "Aircraft Type:", 
+    ("Single Engine", "Multi Engine"),
+    index=0 if last_entry.get('Engine Type') == 'Single Engine' else 1
 )
 
 if st.button("Save Entry"):
@@ -80,7 +87,8 @@ if st.button("Save Entry"):
         'Details of Flight': details_of_flight,
         'Flight Type': flight_type,
         'Day/Night': day_night,
-        'Role': pilot_type
+        'Role': pilot_role,
+        'Engine Type': engine_type
     }
     try:
         df_existing = pd.read_csv('pilot_logbook_master.csv')
