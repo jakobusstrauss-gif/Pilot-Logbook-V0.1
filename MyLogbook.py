@@ -38,5 +38,13 @@ elif st.session_state['step'] == 3:
         st.session_state['flight_data']['Airplane Registration'] = registration
         st.session_state['step'] = 4
 
-# After step 3, further steps can be added following the same pattern
-# For example, adding pilot name, flight details, etc.
+# Step 4: Enter Pilot In Command
+elif st.session_state['step'] == 4:
+    # Show previous data for confirmation
+    st.write(f"**Flight Date:** {st.session_state['flight_data']['Date']}")
+    st.write(f"**Type of Airplane:** {st.session_state['flight_data']['Type of Airplane']}")
+    st.write(f"**Airplane Registration:** {st.session_state['flight_data']['Airplane Registration']}")
+    pilot_in_command = st.text_input("Enter Pilot In Command")
+    if st.button("Next") and pilot_in_command:
+        st.session_state['flight_data']['Pilot In Command'] = pilot_in_command
+        st.session_state['step'] = 5
