@@ -8,7 +8,7 @@ try:
 except:
     df = pd.DataFrame(columns=[
         'Date', 'Type of Airplane', 'Airplane Registration', 'Pilot In Command',
-        'Details of Flight', 'Flight Type', 'Day/Night', 'Role', 'Engine Type',
+        'Details of Flight', 'Day/Night', 'Role', 'Engine Type',
         'Hours Flown'
     ])
 
@@ -55,35 +55,28 @@ details_of_flight = st.text_area(
     value=last_entry.get('Details of Flight', '')
 )
 
-# 1. Visual or Instrument?
-flight_type = st.radio(
-    "Visual or Instrument?", 
-    ("Visual", "Instrument"), 
-    index=0 if last_entry.get('Flight Type') == 'Visual' else 1
-)
-
-# 2. Day or Night?
+# 1. Day or Night?
 day_night = st.radio(
     "Day or Night?", 
     ("Day", "Night"), 
     index=0 if last_entry.get('Day/Night') == 'Day' else 1
 )
 
-# 3. Dual, PIC, PICUS, Co-Pilot?
+# 2. Role: Dual, PIC, PICUS, Co-Pilot
 role = st.radio(
     "Flight Role:", 
     ("Dual", "PIC", "PICUS", "Co-Pilot"), 
     index=0 if last_entry.get('Role') == 'Dual' else 1
 )
 
-# 4. Single Engine or Multi Engine?
+# 3. Single Engine or Multi Engine?
 engine_type = st.radio(
     "Aircraft Type:", 
     ("Single Engine", "Multi Engine"),
     index=0 if last_entry.get('Engine Type') == 'Single Engine' else 1
 )
 
-# 5. Hours Flown
+# 4. Hours Flown
 hours_input = st.text_input(
     "Hours Flown (e.g., 12.34)", 
     value=str(last_entry.get('Hours Flown', ''))
@@ -95,7 +88,7 @@ except:
     hours_value = 0.0
     hours_str = "0.00"
 
-# On clicking Save, save all data
+# Save button to store the data
 if st.button("Save Entry"):
     new_record = {
         'Date': date_value,
@@ -103,7 +96,6 @@ if st.button("Save Entry"):
         'Airplane Registration': registration,
         'Pilot In Command': pilot_in_command,
         'Details of Flight': details_of_flight,
-        'Flight Type': flight_type,
         'Day/Night': day_night,
         'Role': role,
         'Engine Type': engine_type,
